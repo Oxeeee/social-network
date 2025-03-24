@@ -10,13 +10,17 @@ const createAuthSchema = (isLogin: boolean) => {
   const username = isLogin
     ? z.string().optional()
     : z.string().nonempty("Не должен быть пустым");
+  const name = isLogin
+    ? z.string().optional()
+    : z.string().min(2, "Имя должно состоять минимум из 2 знаков");
 
   return z.object({
-    email: z.string().email("Неверный email"),
     username,
+    name,
+    email: z.string().email("Неверный email"),
     password: z
       .string()
-      .min(5, "Должен содержать минимум 5 знаков")
+      .min(8, "Должен содержать минимум 5 знаков")
       .regex(containUppercaseRegexp, "Должен содержать хотя бы одну заглавную"),
   });
 };
@@ -30,12 +34,14 @@ export const useAuthForm = (isLogin: boolean) => {
       username: "",
       password: "",
       email: "",
+      name: "",
     },
   });
 
   useDidMount(() => {
     if (isLogin) {
       unregister("username");
+      unregister("name");
     }
   });
 
