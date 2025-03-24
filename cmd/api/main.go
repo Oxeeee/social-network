@@ -1,0 +1,45 @@
+package main
+
+import (
+	"log/slog"
+	"os"
+
+	"github.com/Oxeeee/shopping-yona/internal/app"
+	"github.com/Oxeeee/shopping-yona/internal/config"
+	"github.com/Oxeeee/shopping-yona/internal/db"
+	"github.com/Oxeeee/shopping-yona/internal/repo"
+	"github.com/Oxeeee/shopping-yona/internal/service"
+	"github.com/Oxeeee/shopping-yona/internal/transport/handlers"
+)
+
+const (
+	envLocal = "local"
+	envProd  = "prod"
+)
+
+func main() {
+	cfg := config.MustLoad()
+	log := setupLogger(cfg.Env)
+	log.Info("starting...")
+
+	db := db.ConnectDatabase(*cfg).GetDB()
+	repo := repo.NewRepo(db, log)
+	service := service.NewService(log, cfg, repo)
+	handlers := handlers.NewHandler(log, service)
+
+	server := app.New(log, handlers)
+	server.Start()
+}
+
+func setupLogger(env string) *slog.Logger {
+	var log *slog.Logger
+
+	switch env {
+	case envLocal:
+		log = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
+	case envProd:
+		log = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}))
+	}
+
+	return log
+}

@@ -1,0 +1,30 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: shopping
+      POSTGRES_DB: postgres
+    ports:
+      - "5435:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - shopping
+  shopping:
+    build: ./
+    container_name: shopping
+    depends_on:
+      - postgres
+    networks:
+      - shopping
+    ports:
+      - "3000:3000"
+
+networks:
+  shopping:
+    driver: bridge
+
+volumes:
+  pgdata:
