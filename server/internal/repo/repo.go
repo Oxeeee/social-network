@@ -10,7 +10,8 @@ import (
 
 type Repo interface {
 	Register(user domain.User) error
-	GetUserByUsername(username string) (*domain.User, error)
+	GetUserByEmail(email string) (*domain.User, error)
+	SaveUser(user domain.User) error
 }
 
 type repo struct {
@@ -57,15 +58,29 @@ func (r *repo) Register(user domain.User) error {
 	return nil
 }
 
-func (r *repo) GetUserByUsername(username string) (*domain.User, error) {
-	const op = "repo.getUserByUsername"
+func (r *repo) GetUserByEmail(email string) (*domain.User, error) {
+	const op = "repo.getUserByEmail"
 	log := r.log.With(slog.String("op", op))
 	var user domain.User
-	err := r.db.Model(&domain.User{}).Where("username = ?", username).Find(&user).Error
-	if err != nil {
-		log.Error("get by username", "error", err)
+	err := r.db.Model(&domain.User{}).Where("email = ?", email).Find(&user).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		log.Error("get by email", "error", err)
 		return nil, err
+	}
+	if err == gorm.ErrRecordNotFound {
+		log.Debug("get by email", "error", err)
+		return nil, cerrors.ErrInvalidEmail
 	}
 
 	return &user, nil
+}
+
+func (r *repo) SaveUser(user domain.User) error {
+	const op = "repo.saveUser"
+	log := r.log.With(slog.String("op", op))
+	err := r.db.Model(&domain.User{}).Where("user_id = ?", user.ID).Save(user).Error
+	if err != nil {
+		log.Error("save user", "error", err)
+		return err
+	}
 }
