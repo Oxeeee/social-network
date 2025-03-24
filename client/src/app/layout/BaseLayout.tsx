@@ -1,15 +1,15 @@
-import { Container } from '@mui/material'
-import { Header } from '@/shared/ui/Header'
-import { Navigate, Outlet } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-import { userSelectors } from '@/shared/store/userSlice/userSlice'
-import { ROUTER_PATHS } from '@/shared/routes'
+import { Container } from "@mui/material";
+import { Header } from "@/shared/ui/Header";
+import { Navigate, Outlet } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { userSelectors } from "@/shared/store/userSlice/userSlice";
+import { ROUTER_PATHS } from "@/shared/routes";
 
 export const BaseLayout = () => {
-  const isAuthorized = useSelector(userSelectors.isAuthorized)
+  const isAuthorized = useSelector(userSelectors.isAuthorized);
 
   if (!isAuthorized) {
-    return <Navigate to={ROUTER_PATHS.REGISTER.pathname} />
+    return <Navigate to={ROUTER_PATHS.REGISTER.pathname} />;
   }
 
   return (
@@ -17,11 +17,11 @@ export const BaseLayout = () => {
       <Header />
       <Container
         sx={{
-          position: 'relative'
+          position: "relative",
         }}
       >
         <Outlet />
       </Container>
     </>
-  )
-}
+  );
+};

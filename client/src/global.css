@@ -8,3 +8,7 @@ ul {
   text-decoration: none;
   color: currentcolor;
 }
+
+.css-r3djoj-MuiTouchRipple-root {
+  pointer-events: initial !important;
+}
