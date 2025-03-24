@@ -1,0 +1,14 @@
+.postsList {
+  --column-count: 2;
+  display: grid;
+  place-content: center;
+  gap: 10px;
+  grid-template-columns: repeat(var(--column-count), 1fr);
+  justify-content: center;
+}
+
+@media screen and (max-width: 880px) {
+  .postsList {
+    --column-count: 1;
+  }
+}
