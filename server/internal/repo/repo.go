@@ -70,6 +70,10 @@ func (r *repo) GetUserByEmail(email string) (*domain.User, error) {
 		log.Error("get by email", "error", err)
 		return nil, err
 	}
+	if err == gorm.ErrRecordNotFound {
+		log.Debug("get by email", "error", err)
+		return nil, cerrors.ErrInvalidEmail
+	}
 
 	return &user, nil
 }
