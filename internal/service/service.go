@@ -3,8 +3,8 @@ package service
 import (
 	"log/slog"
 
-	"github.com/Oxeeee/shopping-yona/internal/config"
-	"github.com/Oxeeee/shopping-yona/internal/repo"
+	"github.com/Oxeeee/social-network/internal/config"
+	"github.com/Oxeeee/social-network/internal/repo"
 )
 
 type Service interface {

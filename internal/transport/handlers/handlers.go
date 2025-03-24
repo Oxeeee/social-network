@@ -3,7 +3,7 @@ package handlers
 import (
 	"log/slog"
 
-	"github.com/Oxeeee/shopping-yona/internal/service"
+	"github.com/Oxeeee/social-network/internal/service"
 )
 
 type Handlers interface {

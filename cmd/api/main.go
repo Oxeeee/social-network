@@ -4,12 +4,12 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/Oxeeee/shopping-yona/internal/app"
-	"github.com/Oxeeee/shopping-yona/internal/config"
-	"github.com/Oxeeee/shopping-yona/internal/db"
-	"github.com/Oxeeee/shopping-yona/internal/repo"
-	"github.com/Oxeeee/shopping-yona/internal/service"
-	"github.com/Oxeeee/shopping-yona/internal/transport/handlers"
+	"github.com/Oxeeee/social-network/internal/app"
+	"github.com/Oxeeee/social-network/internal/config"
+	"github.com/Oxeeee/social-network/internal/db"
+	"github.com/Oxeeee/social-network/internal/repo"
+	"github.com/Oxeeee/social-network/internal/service"
+	"github.com/Oxeeee/social-network/internal/transport/handlers"
 )
 
 const (

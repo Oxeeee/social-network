@@ -4,35 +4,33 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/Oxeeee/shopping-yona/internal/transport/handlers"
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
-	swaggerfiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/Oxeeee/social-network/internal/transport/handlers"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
 type App struct {
-	engine *gin.Engine
+	engine *echo.Echo
 }
 
 func New(log *slog.Logger, handlers handlers.Handlers) *App {
-	engine := gin.New()
-	engine.Use(gin.Logger())
-	engine.Use(cors.New(cors.Config{
+	e := echo.New()
+
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     []string{"http://localhost:5173", "https://theca.oxytocingroup.com"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowMethods:     []string{echo.GET, echo.POST, echo.PUT, echo.DELETE, echo.OPTIONS},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length", "Authorization"},
 		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
+		MaxAge:           int(12 * time.Hour / time.Second),
 	}))
-	engine.SetTrustedProxies(nil)
 
-	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
-	return &App{engine: engine}
+	return &App{engine: e}
 }
 
 func (a *App) Start() {
-	a.engine.Run(":3000")
+	a.engine.Start(":3000")
 }

@@ -5,8 +5,8 @@ import (
 
 	"log"
 
-	"github.com/Oxeeee/shopping-yona/internal/config"
-	"github.com/Oxeeee/shopping-yona/internal/models/domain"
+	"github.com/Oxeeee/social-network/internal/config"
+	"github.com/Oxeeee/social-network/internal/models/domain"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
