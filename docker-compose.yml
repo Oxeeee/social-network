@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:latest
-    container_name: postgres
+    container_name: postgresdb
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: y0na
@@ -12,18 +12,18 @@ services:
       - pgdata:/var/lib/postgresql/data
     networks:
       - social_network
-  social_network:
-    build: ./
-    container_name: social_network
-    depends_on:
-      - postgres
-    networks:
-      - shopping
-    ports:
-      - "3000:3000"
+  # social_network:
+  #   build: ./
+  #   container_name: social_network
+  #   depends_on:
+  #     - postgres
+  #   networks:
+  #     - shopping
+  #   ports:
+  #     - "3000:3000"
 
 networks:
-  shopping:
+  social_network:
     driver: bridge
 
 volumes:

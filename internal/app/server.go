@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/Oxeeee/social-network/internal/transport/handlers"
+	customvalidator "github.com/Oxeeee/social-network/internal/utils/validator"
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
@@ -16,6 +18,7 @@ type App struct {
 
 func New(log *slog.Logger, handlers handlers.Handlers) *App {
 	e := echo.New()
+	e.Validator = &customvalidator.CustomValidator{Validator: validator.New()}
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     []string{"http://localhost:5173", "https://theca.oxytocingroup.com"},
@@ -27,6 +30,9 @@ func New(log *slog.Logger, handlers handlers.Handlers) *App {
 	}))
 
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
+
+	e.GET("/hello", handlers.HelloWorld)
+	e.POST("/register", handlers.Register)
 
 	return &App{engine: e}
 }
