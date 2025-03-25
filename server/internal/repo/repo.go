@@ -12,6 +12,7 @@ type Repo interface {
 	Register(user domain.User) error
 	GetUserByEmail(email string) (*domain.User, error)
 	SaveUser(user domain.User) error
+	GetUserByID(userID uint) (*domain.User, error)
 }
 
 type repo struct {
@@ -84,4 +85,18 @@ func (r *repo) SaveUser(user domain.User) error {
 	}
 
 	return nil
+}
+
+func (r *repo) GetUserByID(userID uint) (*domain.User, error) {
+	const op = "repo.getUserByID"
+	log := r.log.With(slog.String("op", op))
+
+	var user domain.User
+	err := r.db.Model(&domain.User{}).Where("id = ?", userID).First(&user).Error
+	if err != nil {
+		log.Error("get user by id", "error", err)
+		return nil, err
+	}
+
+	return &user, nil
 }

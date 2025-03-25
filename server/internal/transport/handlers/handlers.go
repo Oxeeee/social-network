@@ -15,9 +15,10 @@ import (
 )
 
 type Handlers interface {
-	HelloWorld(c echo.Context) error
 	Register(c echo.Context) error
 	Login(c echo.Context) error
+	Logout(c echo.Context) error
+	LogoutFromAllSessions(c echo.Context) error
 }
 
 type handlers struct {
@@ -79,14 +80,52 @@ func (h *handlers) Login(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, responses.Response{Error: err.Error()})
 	}
 
-	refreshCookie := new(http.Cookie)
-	refreshCookie.Name = "refreshToken"
-	refreshCookie.Value = refreshToken
-	refreshCookie.Expires = time.Now().Add(7 * 24 * time.Hour)
-	refreshCookie.HttpOnly = true
-	refreshCookie.Secure = false
-	refreshCookie.Path = "/"
-	c.SetCookie(refreshCookie)
+	c.SetCookie(&http.Cookie{
+		Name:     "refreshToken",
+		Value:    refreshToken,
+		Path:     "/",
+		HttpOnly: true,
+		Expires:  time.Now().Add(7 * 24 * time.Hour),
+		Secure:   false,
+		SameSite: http.SameSiteLaxMode,
+	})
 
 	return c.JSON(http.StatusOK, responses.Response{Message: "user logged in successfully", Details: map[string]any{"accessToken": accessToken}})
+}
+
+func (h *handlers) Logout(c echo.Context) error {
+	c.SetCookie(&http.Cookie{
+		Name:     "refreshToken",
+		Value:    "",
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+		Secure:   false,
+		SameSite: http.SameSiteLaxMode,
+	})
+	return c.JSON(http.StatusOK, responses.Response{Message: "user logged out successfully"})
+}
+
+func (h *handlers) LogoutFromAllSessions(c echo.Context) error {
+	userID := c.Get("userID")
+	if userID == nil {
+		return c.JSON(http.StatusInternalServerError, responses.Response{Error: "didnt find userID in context value"})
+	}
+
+	err := h.service.LogoutFromAllSessions(userID.(uint))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responses.Response{Error: err.Error()})
+	}
+
+	c.SetCookie(&http.Cookie{
+		Name:     "refreshToken",
+		Value:    "",
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+		Secure:   false,
+		SameSite: http.SameSiteLaxMode,
+	})
+
+	return c.JSON(http.StatusOK, responses.Response{Message: "logged out from all sessions"})
 }

@@ -15,6 +15,7 @@ import (
 type Service interface {
 	Register(req requests.Register) error
 	Login(req requests.Login) (string, string, error)
+	LogoutFromAllSessions(userID uint) error
 }
 
 type service struct {
@@ -84,4 +85,18 @@ func (s *service) Login(req requests.Login) (string, string, error) {
 	}
 
 	return accessToken, refreshToken, nil
+}
+
+func (s *service) LogoutFromAllSessions(userID uint) error {
+	user, err := s.repo.GetUserByID(userID)
+	if err != nil {
+		return err
+	}
+
+	user.RefreshTokenVersion += 1
+
+	if err := s.repo.SaveUser(*user); err != nil {
+		return err
+	}
+	return nil
 }

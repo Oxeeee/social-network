@@ -33,9 +33,10 @@ func New(log *slog.Logger, handlers handlers.Handlers) *App {
 
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
-	e.GET("/hello", handlers.HelloWorld)
 	e.POST("/register", handlers.Register)
 	e.POST("/login", handlers.Login)
+	e.POST("/logout", handlers.Logout)
+	e.POST("/logoutall", handlers.LogoutFromAllSessions)
 
 	return &App{engine: e}
 }
