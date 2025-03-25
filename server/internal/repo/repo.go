@@ -62,14 +62,13 @@ func (r *repo) GetUserByEmail(email string) (*domain.User, error) {
 	const op = "repo.getUserByEmail"
 	log := r.log.With(slog.String("op", op))
 	var user domain.User
-	err := r.db.Model(&domain.User{}).Where("email = ?", email).Find(&user).Error
-	if err != nil && err != gorm.ErrRecordNotFound {
+	if err := r.db.Model(&domain.User{}).Where("email = ?", email).First(&user).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			log.Debug("get by email", "error", err)
+			return nil, cerrors.ErrInvalidEmail
+		}
 		log.Error("get by email", "error", err)
 		return nil, err
-	}
-	if err == gorm.ErrRecordNotFound {
-		log.Debug("get by email", "error", err)
-		return nil, cerrors.ErrInvalidEmail
 	}
 
 	return &user, nil
