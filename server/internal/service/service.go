@@ -77,15 +77,9 @@ func (s *service) Login(req requests.Login) (string, string, error) {
 		return "", "", err
 	}
 
-	refreshToken, err := jwtauth.GenerateRefreshToken(user.ID, []byte(s.cfg.JWT.RefreshSecret))
+	refreshToken, err := jwtauth.GenerateRefreshToken(user.ID, user.RefreshTokenVersion, []byte(s.cfg.JWT.RefreshSecret))
 	if err != nil {
 		log.Error("generate refresh token", "error", err)
-		return "", "", err
-	}
-
-	user.JWTRefreshToken = refreshToken
-	err = s.repo.SaveUser(*user)
-	if err != nil {
 		return "", "", err
 	}
 

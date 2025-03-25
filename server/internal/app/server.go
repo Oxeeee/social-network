@@ -6,6 +6,7 @@ import (
 
 	"github.com/Oxeeee/social-network/internal/transport/handlers"
 	customvalidator "github.com/Oxeeee/social-network/internal/utils/validator"
+	loggermiddleware "github.com/Oxeeee/social-network/pkg/logger_middleware"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -28,11 +29,13 @@ func New(log *slog.Logger, handlers handlers.Handlers) *App {
 		AllowCredentials: true,
 		MaxAge:           int(12 * time.Hour / time.Second),
 	}))
+	e.Use(loggermiddleware.RequestLogger)
 
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	e.GET("/hello", handlers.HelloWorld)
 	e.POST("/register", handlers.Register)
+	e.POST("/login", handlers.Login)
 
 	return &App{engine: e}
 }

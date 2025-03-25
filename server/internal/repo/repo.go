@@ -78,9 +78,11 @@ func (r *repo) GetUserByEmail(email string) (*domain.User, error) {
 func (r *repo) SaveUser(user domain.User) error {
 	const op = "repo.saveUser"
 	log := r.log.With(slog.String("op", op))
-	err := r.db.Model(&domain.User{}).Where("user_id = ?", user.ID).Save(user).Error
+	err := r.db.Model(&domain.User{}).Where("id = ?", user.ID).Save(user).Error
 	if err != nil {
 		log.Error("save user", "error", err)
 		return err
 	}
+
+	return nil
 }

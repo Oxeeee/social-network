@@ -6,13 +6,13 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type CustomClaims struct {
+type CustomAccessClaims struct {
 	UserID uint `json:"userId"`
 	jwt.RegisteredClaims
 }
 
 func GenerateAccessToken(userID uint, accessSecret []byte) (string, error) {
-	claims := CustomClaims{
+	claims := CustomAccessClaims{
 		UserID: userID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(15 * time.Minute)),
@@ -24,9 +24,16 @@ func GenerateAccessToken(userID uint, accessSecret []byte) (string, error) {
 	return token.SignedString(accessSecret)
 }
 
-func GenerateRefreshToken(userID uint, refreshSecret []byte) (string, error) {
-	claims := CustomClaims{
-		UserID: userID,
+type CustomRefreshClaims struct {
+	UserID       uint `json:"userId"`
+	TokenVersion uint `json:"tokenVersion"`
+	jwt.RegisteredClaims
+}
+
+func GenerateRefreshToken(userID, tokenVersion uint, refreshSecret []byte) (string, error) {
+	claims := CustomRefreshClaims{
+		UserID:       userID,
+		TokenVersion: tokenVersion,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(7 * 24 * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

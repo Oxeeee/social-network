@@ -24,7 +24,7 @@ type Database struct {
 
 type JWT struct {
 	AccessSecret  string `yaml:"access_secret" env-required:"true"`
-	RefreshSecret string `yaml:"access_secret" env-required:"true"`
+	RefreshSecret string `yaml:"refresh_secret" env-required:"true"`
 }
 
 func MustLoad() *Config {

@@ -17,6 +17,7 @@ import (
 type Handlers interface {
 	HelloWorld(c echo.Context) error
 	Register(c echo.Context) error
+	Login(c echo.Context) error
 }
 
 type handlers struct {
@@ -48,9 +49,9 @@ func (h *handlers) Register(c echo.Context) error {
 	err := h.service.Register(req)
 	if err != nil {
 		if errors.Is(err, cerrors.ErrUsernameTaken) {
-			c.JSON(http.StatusBadRequest, responses.Response{Error: err})
+			c.JSON(http.StatusBadRequest, responses.Response{Error: err.Error()})
 		} else if errors.Is(err, cerrors.ErrEmailTaken) {
-			c.JSON(http.StatusBadRequest, responses.Response{Error: err})
+			c.JSON(http.StatusBadRequest, responses.Response{Error: err.Error()})
 		}
 		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Can not register user: %s", err))
 	}
@@ -70,30 +71,22 @@ func (h *handlers) Login(c echo.Context) error {
 	accessToken, refreshToken, err := h.service.Login(req)
 	if err != nil {
 		if errors.Is(err, cerrors.ErrInvalidEmail) {
-			return c.JSON(http.StatusBadRequest, responses.Response{Error: err})
+			return c.JSON(http.StatusBadRequest, responses.Response{Error: err.Error()})
 		}
 		if errors.Is(err, cerrors.ErrInvalidPassword) {
-			return c.JSON(http.StatusUnauthorized, responses.Response{Error: err})
+			return c.JSON(http.StatusUnauthorized, responses.Response{Error: err.Error()})
 		}
-		return c.JSON(http.StatusInternalServerError, responses.Response{Error: err})
+		return c.JSON(http.StatusInternalServerError, responses.Response{Error: err.Error()})
 	}
-
-	accessCookie := new(http.Cookie)
-	accessCookie.Name = "accessToken"
-	accessCookie.Value = accessToken
-	accessCookie.Expires = time.Now().Add(15 * time.Minute)
-	accessCookie.HttpOnly = true
-	accessCookie.Secure = false
-	accessCookie.Path = "/"
-	c.SetCookie(accessCookie)
 
 	refreshCookie := new(http.Cookie)
 	refreshCookie.Name = "refreshToken"
 	refreshCookie.Value = refreshToken
-	refreshCookie.Expires = time.Now().Add(15 * time.Minute)
+	refreshCookie.Expires = time.Now().Add(7 * 24 * time.Hour)
 	refreshCookie.HttpOnly = true
 	refreshCookie.Secure = false
 	refreshCookie.Path = "/"
 	c.SetCookie(refreshCookie)
-	return c.JSON(http.StatusOK, responses.Response{Message: "user logged in successfully", Details: map[string]any{"accessToken": accessToken, "refreshToken": refreshToken}})
+
+	return c.JSON(http.StatusOK, responses.Response{Message: "user logged in successfully", Details: map[string]any{"accessToken": accessToken}})
 }
