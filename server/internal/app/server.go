@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/Oxeeee/social-network/internal/transport/handlers"
+	authmw "github.com/Oxeeee/social-network/internal/utils/authmiddleware"
 	customvalidator "github.com/Oxeeee/social-network/internal/utils/validator"
 	loggermiddleware "github.com/Oxeeee/social-network/pkg/logger_middleware"
 	"github.com/go-playground/validator/v10"
@@ -17,7 +18,7 @@ type App struct {
 	engine *echo.Echo
 }
 
-func New(log *slog.Logger, handlers handlers.Handlers) *App {
+func New(log *slog.Logger, handlers handlers.Handlers, mw authmw.AuthMiddleware) *App {
 	e := echo.New()
 	e.Validator = &customvalidator.CustomValidator{Validator: validator.New()}
 
@@ -35,8 +36,10 @@ func New(log *slog.Logger, handlers handlers.Handlers) *App {
 
 	e.POST("/register", handlers.Register)
 	e.POST("/login", handlers.Login)
-	e.POST("/logout", handlers.Logout)
-	e.POST("/logoutall", handlers.LogoutFromAllSessions)
+
+	secure := e.Group("/secure", mw.JWTMiddleware)
+	secure.POST("/logout", handlers.Logout)
+	secure.POST("/logoutall", handlers.LogoutFromAllSessions)
 
 	return &App{engine: e}
 }

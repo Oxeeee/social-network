@@ -94,6 +94,7 @@ func (h *handlers) Login(c echo.Context) error {
 }
 
 func (h *handlers) Logout(c echo.Context) error {
+	h.log.Debug(c.Get("userID").(string))
 	c.SetCookie(&http.Cookie{
 		Name:     "refreshToken",
 		Value:    "",
@@ -107,8 +108,11 @@ func (h *handlers) Logout(c echo.Context) error {
 }
 
 func (h *handlers) LogoutFromAllSessions(c echo.Context) error {
+	const op = "handlers.logoutFromAllSessions"
+	log := h.log.With(slog.String("op", op))
 	userID := c.Get("userID")
 	if userID == nil {
+		log.Error("not found userID in context")
 		return c.JSON(http.StatusInternalServerError, responses.Response{Error: "didnt find userID in context value"})
 	}
 
