@@ -5,13 +5,16 @@ import (
 
 	"github.com/Oxeeee/social-network/internal/config"
 	"github.com/Oxeeee/social-network/internal/models/domain"
+	cerrors "github.com/Oxeeee/social-network/internal/models/errors"
 	"github.com/Oxeeee/social-network/internal/models/requests"
 	"github.com/Oxeeee/social-network/internal/repo"
+	"github.com/Oxeeee/social-network/internal/utils/jwtauth"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type Service interface {
 	Register(req requests.Register) error
+	Login(req requests.Login) (string, string, error)
 }
 
 type service struct {
@@ -52,4 +55,33 @@ func (s *service) Register(req requests.Register) error {
 	}
 
 	return nil
+}
+
+func (s *service) Login(req requests.Login) (string, string, error) {
+	const op = "service.login"
+	log := s.log.With(slog.String("op", op))
+
+	user, err := s.repo.GetUserByEmail(req.Email)
+	if err != nil {
+		return "", "", err
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.PassHash), []byte(req.Password)); err != nil {
+		log.Debug("compare hash and password", "error", err)
+		return "", "", cerrors.ErrInvalidPassword
+	}
+
+	accessToken, err := jwtauth.GenerateAccessToken(user.ID, []byte(s.cfg.JWT.AccessSecret))
+	if err != nil {
+		log.Error("generate access token", "error", err)
+		return "", "", err
+	}
+
+	refreshToken, err := jwtauth.GenerateRefreshToken(user.ID, user.RefreshTokenVersion, []byte(s.cfg.JWT.RefreshSecret))
+	if err != nil {
+		log.Error("generate refresh token", "error", err)
+		return "", "", err
+	}
+
+	return accessToken, refreshToken, nil
 }

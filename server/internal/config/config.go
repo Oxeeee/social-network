@@ -10,6 +10,7 @@ import (
 type Config struct {
 	Env      string `yaml:"env" env-default:"prod"`
 	Database `yaml:"database" env-required:"true"`
+	JWT      `yaml:"jwt" env-required:"true"`
 }
 
 type Database struct {
@@ -19,6 +20,11 @@ type Database struct {
 	Port     int    `yaml:"port" env-required:"true"`
 	Password string `yaml:"password" env-required:"true"`
 	SSLMode  string `yaml:"ssl_mode" env-default:"disable"`
+}
+
+type JWT struct {
+	AccessSecret  string `yaml:"access_secret" env-required:"true"`
+	RefreshSecret string `yaml:"refresh_secret" env-required:"true"`
 }
 
 func MustLoad() *Config {
