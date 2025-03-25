@@ -10,6 +10,7 @@ import (
 	"github.com/Oxeeee/social-network/internal/repo"
 	"github.com/Oxeeee/social-network/internal/service"
 	"github.com/Oxeeee/social-network/internal/transport/handlers"
+	authmw "github.com/Oxeeee/social-network/internal/utils/authmiddleware"
 )
 
 const (
@@ -27,7 +28,8 @@ func main() {
 	service := service.NewService(log, cfg, repo)
 	handlers := handlers.NewHandler(log, service)
 
-	server := app.New(log, handlers)
+	mw := authmw.NewAuthMiddleware(log, cfg)
+	server := app.New(log, handlers, mw)
 	server.Start()
 }
 
