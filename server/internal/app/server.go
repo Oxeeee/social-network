@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"time"
 
+	_ "github.com/Oxeeee/social-network/docs"
 	"github.com/Oxeeee/social-network/internal/transport/handlers"
 	authmw "github.com/Oxeeee/social-network/internal/utils/authmiddleware"
 	customvalidator "github.com/Oxeeee/social-network/internal/utils/validator"
@@ -39,7 +40,7 @@ func New(log *slog.Logger, handlers handlers.Handlers, mw authmw.AuthMiddleware)
 
 	secure := e.Group("/secure", mw.JWTMiddleware)
 	secure.POST("/logout", handlers.Logout)
-	secure.POST("/logoutall", handlers.LogoutFromAllSessions)
+	secure.POST("/logout/all", handlers.LogoutFromAllSessions)
 
 	return &App{engine: e}
 }

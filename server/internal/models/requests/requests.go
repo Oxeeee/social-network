@@ -1,14 +1,23 @@
 package requests
 
+// Register представляет данные для регистрации нового пользователя
 type Register struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required,min=8"`
-	Name     string `json:"name" validate:"required,min=2"`
-	Surname  string `json:"surname,omitempty"`
-	Username string `json:"username" validate:"required,min=3"`
+	// Email пользователя, должен быть уникальным
+	Email string `json:"email" validate:"required,email" example:"user@example.com"`
+	// Имя пользователя
+	Name string `json:"name" validate:"required" example:"Иван"`
+	// Фамилия пользователя
+	Surname string `json:"surname" validate:"required" example:"Иванов"`
+	// Имя для входа, должно быть уникальным
+	Username string `json:"username" validate:"required" example:"ivan2024"`
+	// Пароль пользователя
+	Password string `json:"password" validate:"required,min=8" example:"Password123!"`
 }
 
+// Login представляет данные для входа пользователя
 type Login struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required,min=8"`
+	// Email пользователя
+	Email string `json:"email" validate:"required,email" example:"user@example.com"`
+	// Пароль пользователя
+	Password string `json:"password" validate:"required" example:"Password123!"`
 }
