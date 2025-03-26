@@ -33,11 +33,17 @@ func NewHandler(log *slog.Logger, service service.Service) Handlers {
 	}
 }
 
-func (h *handlers) HelloWorld(c echo.Context) error {
-	c.JSON(200, "Hello mfker")
-	return nil
-}
-
+// Register godoc
+// @Summary Регистрация нового пользователя
+// @Description Регистрирует нового пользователя в системе
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body requests.Register true "Данные для регистрации"
+// @Success 201 {object} responses.Response "Пользователь успешно зарегистрирован"
+// @Failure 400 {object} responses.Response "Ошибка валидации | USERNAME_ALREADY_TAKEN | EMAIL_ALREADY_TAKEN"
+// @Failure 500 {object} responses.Response "Внутренняя ошибка сервера"
+// @Router /register [post]
 func (h *handlers) Register(c echo.Context) error {
 	var req requests.Register
 	if err := c.Bind(&req); err != nil {
@@ -60,6 +66,18 @@ func (h *handlers) Register(c echo.Context) error {
 	return c.JSON(http.StatusCreated, responses.Response{Message: "user registred sucessfully"})
 }
 
+// Login godoc
+// @Summary Вход пользователя
+// @Description Авторизует пользователя и выдает токены доступа
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body requests.Login true "Данные для входа"
+// @Success 200 {object} responses.Response "Пользователь успешно авторизован, возвращает accessToken"
+// @Failure 400 {object} responses.Response "Ошибка валидации | INVALID_EMAIL"
+// @Failure 401 {object} responses.Response "INVALID_PASSWORD"
+// @Failure 500 {object} responses.Response "Внутренняя ошибка сервера"
+// @Router /login [post]
 func (h *handlers) Login(c echo.Context) error {
 	var req requests.Login
 	if err := c.Bind(&req); err != nil {
@@ -93,6 +111,17 @@ func (h *handlers) Login(c echo.Context) error {
 	return c.JSON(http.StatusOK, responses.Response{Message: "user logged in successfully", Details: map[string]any{"accessToken": accessToken}})
 }
 
+// Logout godoc
+// @Summary Выход пользователя
+// @Description Выполняет выход пользователя из текущей сессии
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} responses.Response "Пользователь успешно вышел"
+// @Failure 401 {object} responses.Response "MISSING_AUTHORIZATION_TOKEN | INVALID_AUTHORIZATION_HEADER_FORMAT | INVALID_OR_EXPIRED_TOKEN"
+// @Failure 500 {object} responses.Response "Внутренняя ошибка сервера"
+// @Router /auth/logout [post]
 func (h *handlers) Logout(c echo.Context) error {
 	h.log.Debug(c.Get("userID").(string))
 	c.SetCookie(&http.Cookie{
@@ -107,6 +136,17 @@ func (h *handlers) Logout(c echo.Context) error {
 	return c.JSON(http.StatusOK, responses.Response{Message: "user logged out successfully"})
 }
 
+// LogoutFromAllSessions godoc
+// @Summary Выход из всех сессий
+// @Description Выполняет выход пользователя из всех активных сессий
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} responses.Response "Выход из всех сессий выполнен успешно"
+// @Failure 401 {object} responses.Response "MISSING_AUTHORIZATION_TOKEN | INVALID_AUTHORIZATION_HEADER_FORMAT | INVALID_OR_EXPIRED_TOKEN"
+// @Failure 500 {object} responses.Response "Внутренняя ошибка сервера | Не найден userID в контексте"
+// @Router /auth/logout/all [post]
 func (h *handlers) LogoutFromAllSessions(c echo.Context) error {
 	const op = "handlers.logoutFromAllSessions"
 	log := h.log.With(slog.String("op", op))
