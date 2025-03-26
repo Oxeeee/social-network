@@ -12,8 +12,8 @@ type User struct {
 	Photo               string    `json:"photo"` // URL to avatar
 	PassHash            string    `gorm:"not null" json:"-"`
 	RefreshTokenVersion uint      `json:"-"` // скрываем с фронта
-	CreatedAt           time.Time `json:"createdAt"`
-	UpdatedAt           time.Time `json:"updatedAt"`
+	CreatedAt           time.Time `json:"-"`
+	UpdatedAt           time.Time `json:"-"`
 }
 
 type Post struct {

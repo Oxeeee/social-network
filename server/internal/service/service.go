@@ -35,7 +35,7 @@ func NewService(log *slog.Logger, cfg *config.Config, repo repo.Repo) Service {
 func (s *service) Register(req requests.Register) error {
 	const op = "service.register"
 	log := s.log.With(slog.String("op", op))
-	var user domain.User = domain.User{
+	user := domain.User{
 		Email:    req.Email,
 		Username: req.Username,
 		Name:     req.Name,

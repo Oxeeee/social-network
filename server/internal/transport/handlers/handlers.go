@@ -56,14 +56,14 @@ func (h *handlers) Register(c echo.Context) error {
 	err := h.service.Register(req)
 	if err != nil {
 		if errors.Is(err, cerrors.ErrUsernameTaken) {
-			c.JSON(http.StatusBadRequest, responses.Response{Error: err.Error()})
+			c.JSON(http.StatusBadRequest, responses.Response[any]{Error: err.Error()})
 		} else if errors.Is(err, cerrors.ErrEmailTaken) {
-			c.JSON(http.StatusBadRequest, responses.Response{Error: err.Error()})
+			c.JSON(http.StatusBadRequest, responses.Response[any]{Error: err.Error()})
 		}
 		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Can not register user: %s", err))
 	}
 
-	return c.JSON(http.StatusCreated, responses.Response{Message: "user registred sucessfully"})
+	return c.JSON(http.StatusCreated, responses.Response[any]{Message: "user registred sucessfully"})
 }
 
 // Login godoc
@@ -90,12 +90,12 @@ func (h *handlers) Login(c echo.Context) error {
 	accessToken, refreshToken, err := h.service.Login(req)
 	if err != nil {
 		if errors.Is(err, cerrors.ErrInvalidEmail) {
-			return c.JSON(http.StatusBadRequest, responses.Response{Error: err.Error()})
+			return c.JSON(http.StatusBadRequest, responses.Response[any]{Error: err.Error()})
 		}
 		if errors.Is(err, cerrors.ErrInvalidPassword) {
-			return c.JSON(http.StatusUnauthorized, responses.Response{Error: err.Error()})
+			return c.JSON(http.StatusUnauthorized, responses.Response[any]{Error: err.Error()})
 		}
-		return c.JSON(http.StatusInternalServerError, responses.Response{Error: err.Error()})
+		return c.JSON(http.StatusInternalServerError, responses.Response[any]{Error: err.Error()})
 	}
 
 	c.SetCookie(&http.Cookie{
@@ -108,7 +108,14 @@ func (h *handlers) Login(c echo.Context) error {
 		SameSite: http.SameSiteLaxMode,
 	})
 
-	return c.JSON(http.StatusOK, responses.Response{Message: "user logged in successfully", Details: map[string]any{"accessToken": accessToken}})
+	resp := responses.Response[responses.LoginResponse]{
+		Data: responses.LoginResponse{
+			AccessToken: accessToken,
+		},
+		Message: "user logged in successfully",
+	}
+	
+	return c.JSON(http.StatusOK, resp)
 }
 
 // Logout godoc
@@ -133,7 +140,7 @@ func (h *handlers) Logout(c echo.Context) error {
 		Secure:   false,
 		SameSite: http.SameSiteLaxMode,
 	})
-	return c.JSON(http.StatusOK, responses.Response{Message: "user logged out successfully"})
+	return c.JSON(http.StatusOK, responses.Response[any]{Message: "user logged out successfully"})
 }
 
 // LogoutFromAllSessions godoc
@@ -153,12 +160,12 @@ func (h *handlers) LogoutFromAllSessions(c echo.Context) error {
 	userID := c.Get("userID")
 	if userID == nil {
 		log.Error("not found userID in context")
-		return c.JSON(http.StatusInternalServerError, responses.Response{Error: "didnt find userID in context value"})
+		return c.JSON(http.StatusInternalServerError, responses.Response[any]{Error: "didnt find userID in context value"})
 	}
 
 	err := h.service.LogoutFromAllSessions(userID.(uint))
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, responses.Response{Error: err.Error()})
+		return c.JSON(http.StatusInternalServerError, responses.Response[any]{Error: err.Error()})
 	}
 
 	c.SetCookie(&http.Cookie{
@@ -171,5 +178,5 @@ func (h *handlers) LogoutFromAllSessions(c echo.Context) error {
 		SameSite: http.SameSiteLaxMode,
 	})
 
-	return c.JSON(http.StatusOK, responses.Response{Message: "logged out from all sessions"})
+	return c.JSON(http.StatusOK, responses.Response[any]{Message: "logged out from all sessions"})
 }
