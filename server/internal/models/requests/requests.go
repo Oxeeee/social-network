@@ -8,10 +8,12 @@ type Register struct {
 	Name string `json:"name" validate:"required" example:"Иван"`
 	// Фамилия пользователя
 	Surname string `json:"surname" validate:"required" example:"Иванов"`
-	// Имя для входа, должно быть уникальным
+	// Имя пользователя, должно быть уникальным
 	Username string `json:"username" validate:"required" example:"ivan2024"`
 	// Пароль пользователя
 	Password string `json:"password" validate:"required,min=8" example:"Password123!"`
+	// Фото юзера (base64)
+	PhotoEncrypted string `json:"photo" example:"base64url"`
 }
 
 // Login представляет данные для входа пользователя

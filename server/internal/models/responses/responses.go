@@ -11,5 +11,10 @@ type Response[Data any] struct {
 }
 
 type LoginResponse struct {
-	AccessToken string `json:"accessToken"`
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"-"`
+	Username     string `json:"username"`
+	Name         string `json:"name"`
+	Surname      string `json:"surname"`
+	Photo        string `json:"photo,omitempty"`
 }
