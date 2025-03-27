@@ -2,7 +2,7 @@ import { Container } from "@mui/material";
 import { Header } from "@/shared/ui/Header";
 import { Navigate, Outlet } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { userSelectors } from "@/shared/store/userSlice/userSlice";
+import { userSelectors } from "@/entites/user/store/userSlice";
 import { ROUTER_PATHS } from "@/shared/routes";
 
 export const BaseLayout = () => {

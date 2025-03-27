@@ -1,5 +1,21 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: "https://49e5b8ea6d5f394a.mokky.dev",
+  baseURL: "http://localhost:3000",
 });
+
+api.interceptors.request.use(
+  function (config) {
+    
+    const { accessToken } = JSON.parse(localStorage.getItem("session")!);
+
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+
+    return config;
+  },
+  function (error) {
+    return Promise.reject(error);
+  },
+);

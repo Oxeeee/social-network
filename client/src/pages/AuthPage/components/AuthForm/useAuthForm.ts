@@ -2,21 +2,32 @@ import { useDidMount } from "@/shared/lib/react/useDidMount";
 import { zodResolver } from "@hookform/resolvers/zod/src/zod.js";
 
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { z, ZodString } from "zod";
 
 const containUppercaseRegexp = /[A-Z]/;
 
+const createFieldOptional = (field: ZodString, isOptional: boolean) => {
+  return isOptional ? z.string().optional() : field;
+};
+
 const createAuthSchema = (isLogin: boolean) => {
-  const username = isLogin
-    ? z.string().optional()
-    : z.string().nonempty("Не должен быть пустым");
-  const name = isLogin
-    ? z.string().optional()
-    : z.string().min(2, "Имя должно состоять минимум из 2 знаков");
+  const name = createFieldOptional(
+    z.string().min(2, "Имя должно состоять минимум из 2 знаков"),
+    isLogin,
+  );
+  const surname = createFieldOptional(
+    z.string().min(2, "Фамилия должна состоять минимум из 2 знаков"),
+    isLogin,
+  );
+  const username = createFieldOptional(
+    z.string().nonempty("Обязательное поле"),
+    isLogin,
+  );
 
   return z.object({
     username,
     name,
+    surname,
     email: z.string().email("Неверный email"),
     password: z
       .string()
@@ -35,6 +46,7 @@ export const useAuthForm = (isLogin: boolean) => {
       password: "",
       email: "",
       name: "",
+      surname: "",
     },
   });
 

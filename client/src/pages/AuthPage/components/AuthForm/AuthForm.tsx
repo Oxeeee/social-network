@@ -1,4 +1,4 @@
-import { AccountCircle, Email, Key, Badge } from "@mui/icons-material";
+import { AccountCircle, Email, Key } from "@mui/icons-material";
 import { Box, Button, InputAdornment, Link, Typography } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import { colors } from "@/shared/lib/muiTheme";
@@ -8,7 +8,7 @@ import { SubmitHandler } from "react-hook-form";
 import { ROUTER_PATHS } from "@/shared/routes";
 import { useAppSelector } from "@/shared/lib/redux";
 
-interface AuthFormProps {
+type AuthFormProps = {
   onSubmit: (values: AuthFormFields) => void;
   isLogin: boolean;
 }
@@ -43,23 +43,24 @@ export const AuthForm = ({ onSubmit, isLogin }: AuthFormProps) => {
       >
         {!isLogin && (
           <>
-            <Input
-              label="Введите имя"
-              controller={{
-                control,
-                name: "username",
-              }}
-              slotProps={{
-                input: {
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Badge />
-                    </InputAdornment>
-                  ),
-                },
-              }}
-              autoComplete="off"
-            />
+            <Box display="flex" gap={3}>
+              <Input
+                label="Введите имя"
+                controller={{
+                  control,
+                  name: "name",
+                }}
+                autoComplete="off"
+              />
+              <Input
+                label="Введите фамилию"
+                controller={{
+                  control,
+                  name: "surname",
+                }}
+                autoComplete="off"
+              />
+            </Box>
             <Input
               label="Введите логин"
               controller={{

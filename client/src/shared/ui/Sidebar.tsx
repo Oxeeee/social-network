@@ -11,7 +11,7 @@ import {
 import { NAV_ROUTES, ROUTER_PATHS } from "../routes";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../lib/redux";
-import { userActions } from "../store/userSlice/userSlice";
+import { userActions } from "@/entites/user/store/userSlice";
 
 interface SidebarProps {
   handleToggle: () => void;

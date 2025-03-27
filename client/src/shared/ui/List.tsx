@@ -1,14 +1,14 @@
-import { ComponentProps, ReactNode } from 'react'
+import { ComponentProps, ReactNode } from "react";
 
-interface ListProps<Item> extends ComponentProps<'ul'> {
-  renderItem: (item: Item) => ReactNode
-  items: Item[]
-}
+type ListProps<Item> = {
+  renderItem: (item: Item) => ReactNode;
+  items: Item[];
+} & ComponentProps<"ul">;
 
 export const List = <Item,>({
   className,
   renderItem,
-  items
+  items,
 }: ListProps<Item>) => {
-  return <ul className={className}>{items.map((item) => renderItem(item))}</ul>
-}
+  return <ul className={className}>{items.map((item) => renderItem(item))}</ul>;
+};

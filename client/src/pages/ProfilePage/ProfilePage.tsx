@@ -1,20 +1,18 @@
 import { useAppSelector } from "@/shared/lib/redux";
 import { Avatar, Box, Button, IconButton, Typography } from "@mui/material";
 import { Upload } from "@mui/icons-material";
-
 import styles from "./ProfilePage.module.css";
+import { userSelectors } from "@/entites/user/store/userSlice";
 
 export const ProfilePage = () => {
   const username = useAppSelector((state) => state.user.username);
+  const fullname = useAppSelector(userSelectors.getFullname);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files as FileList;
-
-    // TODO: делать запрос на добавление аватарки
     if (files[0]) {
       const reader = new FileReader();
       reader.readAsDataURL(files[0]);
-
       reader.onload = () => {
         console.log(reader.result);
       };
@@ -22,35 +20,33 @@ export const ProfilePage = () => {
   };
 
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      justifyContent="center"
-      alignItems="center"
-    >
-      <Box position="relative">
-        <Avatar
-          sx={{
-            width: 96,
-            height: 96,
-          }}
-          alt="Аватарка"
-        />
-        <div>
-          <IconButton className={styles.addProfileIcon} aria-label="add-circle">
-            <Upload />
+    <Box className={styles.profileContainer}>
+      <Box className={styles.profileCard}>
+        <Box className={styles.avatarContainer}>
+          <Avatar className={styles.profileAvatar} alt="Profile picture" />
+          <IconButton className={styles.uploadButton} component="label">
+            <Upload fontSize="small" />
+            <input
+              className={styles.hiddenFileInput}
+              accept="image/*"
+              type="file"
+              onChange={handleFileUpload}
+            />
           </IconButton>
-          <Button
-            className={styles.hiddenInput}
-            component="label"
-            role={undefined}
-            tabIndex={-1}
-          >
-            <input type="file" onChange={handleFileUpload} />
-          </Button>
-        </div>
+        </Box>
+
+        <Typography variant="h4" className={styles.username}>
+          {username}
+        </Typography>
+
+        <Typography variant="h5" className={styles.fullName}>
+          {fullname || "Matvey"}
+        </Typography>
+
+        <Button color="inherit" variant="contained">
+          Редактировать
+        </Button>
       </Box>
-      <Typography variant="h2">{username}</Typography>
     </Box>
   );
 };

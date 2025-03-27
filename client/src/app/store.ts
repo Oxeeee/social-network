@@ -1,5 +1,5 @@
 import { postsReducer } from '@/pages/PostsPage/store/postsSlice'
-import { userReducer } from '@/shared/store/userSlice/userSlice'
+import { userReducer } from '@/entites/user/store/userSlice'
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 
 const reducer = combineReducers({
