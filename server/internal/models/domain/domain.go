@@ -9,7 +9,7 @@ type User struct {
 	Surname             string    `json:"surname"`
 	Username            string    `gorm:"unique;not null" json:"username"`
 	Description         string    `json:"description"`
-	Photo               string    `json:"photo"` // URL to avatar
+	PhotoPath           string    `json:"photoPath"` // URL to avatar
 	PassHash            string    `gorm:"not null" json:"-"`
 	RefreshTokenVersion uint      `json:"-"` // скрываем с фронта
 	CreatedAt           time.Time `json:"-"`

@@ -87,7 +87,7 @@ func (h *handlers) Login(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	accessToken, refreshToken, err := h.service.Login(req)
+	loginResp, err := h.service.Login(req)
 	if err != nil {
 		if errors.Is(err, cerrors.ErrInvalidEmail) {
 			return c.JSON(http.StatusBadRequest, responses.Response[any]{Error: err.Error()})
@@ -100,7 +100,7 @@ func (h *handlers) Login(c echo.Context) error {
 
 	c.SetCookie(&http.Cookie{
 		Name:     "refreshToken",
-		Value:    refreshToken,
+		Value:    loginResp.RefreshToken,
 		Path:     "/",
 		HttpOnly: true,
 		Expires:  time.Now().Add(7 * 24 * time.Hour),
@@ -109,12 +109,10 @@ func (h *handlers) Login(c echo.Context) error {
 	})
 
 	resp := responses.Response[responses.LoginResponse]{
-		Data: responses.LoginResponse{
-			AccessToken: accessToken,
-		},
+		Data:    *loginResp,
 		Message: "user logged in successfully",
 	}
-	
+
 	return c.JSON(http.StatusOK, resp)
 }
 
