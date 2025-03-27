@@ -38,10 +38,14 @@ func (s *service) Register(req requests.Register) error {
 	const op = "service.register"
 	log := s.log.With(slog.String("op", op))
 
-	fileName, err := base64encode.FromBase64(req.PhotoEncrypted, req.Username)
-	if err != nil {
-		log.Error("decode from base 64", "error", err)
-		return err
+	var fileName string
+	if req.PhotoEncrypted != "" {
+		var err error
+		fileName, err = base64encode.FromBase64(req.PhotoEncrypted, req.Username)
+		if err != nil {
+			log.Error("decode from base 64", "error", err)
+			return err
+		}
 	}
 
 	user := domain.User{
@@ -94,11 +98,16 @@ func (s *service) Login(req requests.Login) (*responses.LoginResponse, error) {
 		return nil, err
 	}
 
-	photoEncoded, err := base64encode.ToBase64(user.PhotoPath)
-	if err != nil {
-		log.Error("encode to base64", "error", err)
-		return nil, err
+	var photoEncoded string
+	if user.PhotoPath != "" {
+		var err error
+		photoEncoded, err = base64encode.ToBase64(user.PhotoPath)
+		if err != nil {
+			log.Error("encode to base64", "error", err)
+			return nil, err
+		}
 	}
+	
 
 	resp := responses.LoginResponse{
 		AccessToken:  accessToken,
@@ -106,7 +115,10 @@ func (s *service) Login(req requests.Login) (*responses.LoginResponse, error) {
 		Username:     user.Username,
 		Name:         user.Name,
 		Surname:      user.Surname,
-		Photo:        photoEncoded,
+	}
+	
+	if photoEncoded != "" {
+		resp.Photo = photoEncoded
 	}
 
 	return &resp, nil
