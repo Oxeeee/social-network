@@ -24,7 +24,7 @@ func New(log *slog.Logger, handlers handlers.Handlers, mw authmw.AuthMiddleware)
 	e.Validator = &customvalidator.CustomValidator{Validator: validator.New()}
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins:     []string{"http://localhost:5173", "https://theca.oxytocingroup.com"},
+		AllowOrigins:     []string{"http://localhost:5000"},
 		AllowMethods:     []string{echo.GET, echo.POST, echo.PUT, echo.DELETE, echo.OPTIONS},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length", "Authorization"},

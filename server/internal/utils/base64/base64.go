@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -26,6 +27,13 @@ func FromBase64(base64Photo, username string) (string, error) {
 		return "", err
 	}
 
+	dir := filepath.Dir("avatars/")
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			return "", err
+		}
+	}
+	
 	fileName := fmt.Sprintf("avatars/userID-%s.png", username)
 	err = os.WriteFile(fileName, decodedPhoto, 0664)
 	if err != nil {
